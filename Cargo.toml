@@ -7,6 +7,12 @@ edition = "2021"
 color-eyre = "0.6.3"
 crossterm = "0.28.1"
 log = "0.4.22"
+lru = "0.12.4"
 rand = "0.8.5"
 ratatui = "0.28.1"
+thiserror = "1.0.64"
 tokio = { version = "1.40.0", features = ["full"] }
+uuid = "1.10.0"
+
+[dev-dependencies]
+anyhow = "1.0.89"

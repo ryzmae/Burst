@@ -1,6 +1,8 @@
 pub mod kvstore;
 pub mod store;
-
+pub mod memory;
+pub mod error;
+pub mod prelude;
 
 // Testing only
 fn main() {
