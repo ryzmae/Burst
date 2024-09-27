@@ -5,7 +5,8 @@ pub mod error;
 pub mod prelude;
 pub mod server;
 pub mod log;
+pub mod homedir;
 
 fn main () {
-    log::Log::new().info("Starting server...");
+    println!("Hello, world!");
 }

@@ -1,9 +1,8 @@
 use log::Level::{Debug, Error, Info, Trace, Warn};
 use std::io::{Read, Write};
-use std::fs::File;
+use std::fs::{File, OpenOptions};
 use std::path::PathBuf;
-
-const DEFAULT_LOG_FILE: &str = "../burst.log";
+use crate::homedir::homedir;
 
 pub struct Log {
     pub log_file: PathBuf,
@@ -11,9 +10,14 @@ pub struct Log {
 
 impl Log {
     pub fn new() -> Log {
+        let log_file = homedir() + "/.burst.log";
         Log {
-            log_file: PathBuf::from(DEFAULT_LOG_FILE),
+            log_file: PathBuf::from(log_file),
         }
+    }
+
+    pub fn default_log_file(&self) -> String {
+        return homedir() + "/.burst.log";
     }
 
     fn exists(&self) -> bool {
@@ -23,13 +27,17 @@ impl Log {
     pub fn log(&self, level: log::Level, message: &str) -> () {
         let log_message = format!("[{}] - {}\n", level, message);
         if self.exists() {
-            let mut file = File::open(DEFAULT_LOG_FILE).unwrap();
+            let mut file = OpenOptions::new()
+                .write(true)
+                .append(true)
+                .open(self.default_log_file())
+                .unwrap();
 
             file.write_all(log_message.as_bytes()).unwrap();
 
             return;
         } else {
-            let mut file = File::create(DEFAULT_LOG_FILE).unwrap();
+            let mut file = File::create(self.default_log_file()).unwrap();
             file.write_all(log_message.as_bytes()).unwrap();           
             return;
         }
@@ -56,7 +64,10 @@ impl Log {
     }
 
     pub fn get_log(&self) -> Result<String, std::io::Error> {
-        let mut file = File::open(DEFAULT_LOG_FILE).unwrap();
+        let mut file = OpenOptions::new()
+            .read(true)
+            .open(self.default_log_file())
+            .unwrap();
         let mut contents = String::new();
         file.read_to_string(&mut contents).unwrap();
 
@@ -64,7 +75,7 @@ impl Log {
     }
 
     pub fn clear_log(&self) -> Result<(), std::io::Error> {
-        let mut file = File::create(DEFAULT_LOG_FILE).unwrap();
+        let mut file = File::create(self.default_log_file()).unwrap();
         file.write_all("".as_bytes()).unwrap();
 
         return Ok(());
