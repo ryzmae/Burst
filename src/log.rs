@@ -43,7 +43,7 @@ impl Log {
         }
     }
 
-    pub fn debub(&self, message: &str) -> () {
+    pub fn debug(&self, message: &str) -> () {
         self.log(Debug, message);
     }
 

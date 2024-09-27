@@ -10,3 +10,14 @@ pub fn homedir() -> String {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_homedir() {
+        let home = home::home_dir().unwrap();
+        assert_eq!(homedir(), home.display().to_string());
+    }
+}

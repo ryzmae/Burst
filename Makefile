@@ -17,3 +17,6 @@ watch:
 	
 clean:
 	cargo clean
+
+test:
+	cargo test --bin Burst -- --exact --show-output
