@@ -1,5 +1,3 @@
-// stores data on disk
-
 use std::fs::File;
 use std::io::{Read, Write};
 use std::path::PathBuf;
