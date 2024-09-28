@@ -8,6 +8,8 @@ pub mod log;
 pub mod homedir;
 pub mod time;
 
+use crate::server::server::run;
+
 fn main () {
-    println!("Hello, world!");
+    run("127.0.0.1", 7978);
 }

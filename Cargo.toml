@@ -4,8 +4,10 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+chrono = "0.4.38"
 color-eyre = "0.6.3"
 crossterm = "0.28.1"
+figlet-rs = "0.1.5"
 home = "0.5.9"
 log = "0.4.22"
 lru = "0.12.4"

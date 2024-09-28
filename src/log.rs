@@ -38,7 +38,7 @@ impl Log {
             return;
         } else {
             let mut file = File::create(self.default_log_file()).unwrap();
-            file.write_all(log_message.as_bytes()).unwrap();           
+            file.write_all(log_message.as_bytes()).unwrap();
             return;
         }
     }
