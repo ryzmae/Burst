@@ -34,31 +34,39 @@ fn handle_connection(mut stream: TcpStream) {
 
     log.info(&loginfo);
 
-    if request.contains("status") {
-        let response = "HTTP/1.1 200 OK\r\n\r\n";
+    let date = chrono::Utc::now().format("%d-%m-%y %H:%M:%S").to_string();
+
+    if request.contains("shutdown") {
+        let response = format!("[{}] - Server is shutting down...", date);
 
         stream.write(response.as_bytes()).unwrap();
         stream.flush().unwrap();
 
-        log.info("Response sent!");
-
-        return;
-    } else if request.contains("shutdown") {
-        let response = "HTTP/1.1 200 OK\r\n\r\n";
-
-        stream.write(response.as_bytes()).unwrap();
-        stream.flush().unwrap();
-
-        log.info("Response sent!");
+        log.info(&response);
+        println!("{}", response);
 
         std::process::exit(0);
-    } else {
-        let response = "HTTP/1.1 404 NOT FOUND\r\n\r\n";
+    } else if request.contains("SET") {
+        let args = request.split_whitespace().collect::<Vec<&str>>();
+
+        let key = args[1];
+        let value = args[2];
+
+        let response = format!("[{}] - SET key: {} value: {}", date, key, value);
 
         stream.write(response.as_bytes()).unwrap();
         stream.flush().unwrap();
 
-        log.info("Response sent!");
+        log.info(&response);
+
+        return;
+    } else {
+        let response = format!("[{}] - Command not found...", date);
+
+        stream.write(response.as_bytes()).unwrap();
+        stream.flush().unwrap();
+
+        log.info(&response);
 
         return;
     }
@@ -70,10 +78,10 @@ fn start_screen(port: u16) {
     let version = env!("CARGO_PKG_VERSION");
     let pid = std::process::id();
     let site = "http://burst.sh";
-    let date = chrono::Utc::now();
-    let date = date.format("%d-%m-%y %H:%M:%S").to_string();
+    let date = chrono::Utc::now().format("%d-%m-%y %H:%M:%S").to_string();
 
     println!("[{}] - v{} - PID {} - {}", date, version, pid, site);
 
-    println!("[{}] - This server is now ready to accept connections on port {}", date, port)
+    println!("[{}] - This server is now ready to accept connections on port {}", date, port);
+    println!("[{}] - Press ^C to stop the server", date);
 }

@@ -22,4 +22,5 @@ class SocketConnection():
         self.s.close()
 
 if __name__ == '__main__':
-    SocketConnection("127.0.0.1", 7978).exec("Hello, World!")
+    test = SocketConnection("127.0.0.1", 7978).exec("SET")
+    print(test)
