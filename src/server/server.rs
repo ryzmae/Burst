@@ -74,12 +74,12 @@ fn handle_connection(mut stream: TcpStream) {
 }
 
 fn start_screen(port: u16) {
-    render_name("Burst.sh");
+    render_name("Burst");
 
     let pid = std::process::id();
     let date = chrono::Utc::now().format("%d-%m-%y %H:%M:%S").to_string();
 
-    println!("[{}] - v{} - PID {} - {}", date, constants::VERSION, pid, constants::DOMAIN_NAME);
+    println!("[{}] - v{} - PID {}", date, constants::VERSION, pid);
 
     println!("[{}] - This server is now ready to accept connections on port {}", date, port);
     println!("[{}] - Press ^C to stop the server", date);
