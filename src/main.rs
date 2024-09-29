@@ -7,9 +7,10 @@ pub mod server;
 pub mod log;
 pub mod homedir;
 pub mod time;
+pub mod constants;
 
 use crate::server::server::run;
 
 fn main () {
-    run("127.0.0.1", 7978);
+    run();
 }

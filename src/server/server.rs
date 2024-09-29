@@ -5,11 +5,12 @@ use std::{
 use chrono;
 use crate::log::Log;
 use crate::server::render_name::render_name;
+use crate::constants;
 
-pub fn run(addr: &str, port: u16) {
-    let addr = format!("{}:{}", addr, port);
-    let listner = TcpListener::bind(addr).unwrap();
-    start_screen(port);
+pub fn run() {
+    let addr = format!("{}:{}", constants::ADDRESS, constants::PORT);
+    let listner = TcpListener::bind(addr).expect("Failed to bind to address!");
+    start_screen(constants::PORT);
 
     for stream in listner.incoming() {
         match stream {
@@ -75,12 +76,10 @@ fn handle_connection(mut stream: TcpStream) {
 fn start_screen(port: u16) {
     render_name("Burst.sh");
 
-    let version = env!("CARGO_PKG_VERSION");
     let pid = std::process::id();
-    let site = "http://burst.sh";
     let date = chrono::Utc::now().format("%d-%m-%y %H:%M:%S").to_string();
 
-    println!("[{}] - v{} - PID {} - {}", date, version, pid, site);
+    println!("[{}] - v{} - PID {} - {}", date, constants::VERSION, pid, constants::DOMAIN_NAME);
 
     println!("[{}] - This server is now ready to accept connections on port {}", date, port);
     println!("[{}] - Press ^C to stop the server", date);
