@@ -3,11 +3,12 @@ use std::{
     net::{TcpListener, TcpStream},
 };
 use chrono;
-use crate::log::Log;
+use crate::logger::{Level, Logger};
 use crate::server::render_name::render_name;
 use crate::constants;
 
 pub fn run() {
+    let _log = Logger::new(Level::Info);
     let addr = format!("{}:{}", constants::ADDRESS, constants::PORT);
     let listner = TcpListener::bind(addr).expect("Failed to bind to address!");
     start_screen(constants::PORT);
@@ -18,7 +19,7 @@ pub fn run() {
                 std::thread::spawn(|| handle_connection(stream));
             }
             Err(e) => {
-                eprintln!("Failed to establish a connection: {}", e);
+                _log.trace(&format!("Failed to establish a connection: {}", e));
             }
         }
     }
@@ -27,7 +28,7 @@ pub fn run() {
 
 fn handle_connection(mut stream: TcpStream) {
     let mut buffer = [0; 1024];
-    let log = Log::new();
+    let log = Logger::new(Level::Info);
 
     stream.read(&mut buffer).expect("Failed to read from client!");
     let request = String::from_utf8_lossy(&buffer[..]);
@@ -38,13 +39,14 @@ fn handle_connection(mut stream: TcpStream) {
     let date = chrono::Utc::now().format("%d-%m-%y %H:%M:%S").to_string();
 
     if request.contains("shutdown") {
-        let response = format!("[{}] - Server is shutting down...", date);
+        let response = format!("Server is shutting down...");
 
         stream.write(response.as_bytes()).unwrap();
         stream.flush().unwrap();
 
         log.info(&response);
-        println!("{}", response);
+        
+        log.info("Shutting down the server...");
 
         std::process::exit(0);
     } else if request.contains("SET") {
@@ -74,13 +76,10 @@ fn handle_connection(mut stream: TcpStream) {
 }
 
 fn start_screen(port: u16) {
+    let _log = Logger::new(Level::Info);
     render_name("Burst");
 
-    let pid = std::process::id();
-    let date = chrono::Utc::now().format("%d-%m-%y %H:%M:%S").to_string();
-
-    println!("[{}] - v{} - PID {}", date, constants::VERSION, pid);
-
-    println!("[{}] - This server is now ready to accept connections on port {}", date, port);
-    println!("[{}] - Press ^C to stop the server", date);
+    _log.info(&format!("v{} - PID {}", constants::VERSION, std::process::id()));
+    _log.info(&format!("This instance of Burst is now ready to accept connections on port {}",port));
+    _log.info(&format!("- Press ^C to stop the server",));
 }
