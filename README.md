@@ -1,3 +1,15 @@
+# NOTE
+This branch is unreleased version and not stable or executable
+We are working to release this Branch in the near Feature 
+
+# Roadmap
+X = Not Done, V = Done 
+Homebrew support [x]
+Custom Libaries for each Language []
+    - Python [x]
+    - Javascript/Typescript [x]
+    - Rust [x]
+    - Golang [x]
 # Burst
 
 Lighting fast in-memory database with on disk storage.
