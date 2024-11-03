@@ -86,3 +86,56 @@ impl Logger {
         println!("{}", log_message);
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_logger() {
+        let logger = Logger::new(Level::Info);
+        logger.info("Info Log");
+        logger.debug("Debug Log");
+        logger.trace("Trace Log");
+        logger.warn("Warn Log");
+    }
+
+    #[test]
+    fn test_default_log_file() {
+        let logger = Logger::new(Level::Info);
+        assert_eq!(logger.default_log_file(), homedir() + "/.burst.log");
+    }
+
+    #[test]
+    fn test_log() {
+        let logger = Logger::new(Level::Info);
+        logger.log(Level::Info, "Info Log");
+        logger.log(Level::Debug, "Debug Log");
+        logger.log(Level::Trace, "Trace Log");
+        logger.log(Level::Warn, "Warn Log");
+    }
+
+    #[test]
+    fn test_info() {
+        let logger = Logger::new(Level::Info);
+        logger.info("Info Log");
+    }
+
+    #[test]
+    fn test_debug() {
+        let logger = Logger::new(Level::Info);
+        logger.debug("Debug Log");
+    }
+
+    #[test]
+    fn test_trace() {
+        let logger = Logger::new(Level::Info);
+        logger.trace("Trace Log");
+    }
+
+    #[test]
+    fn test_warn() {
+        let logger = Logger::new(Level::Info);
+        logger.warn("Warn Log");
+    }
+}
