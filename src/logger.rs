@@ -31,6 +31,7 @@ impl Logger {
     /// This the default Log Level for the Logger
     pub fn info(&self, message: &str) -> () {
         self.log(Level::Info, message);
+        return;
     }
 
     /// Debug Log function
@@ -38,6 +39,7 @@ impl Logger {
     /// This the debug Log Level for the Logger
     pub fn debug(&self, message: &str) -> () {
         self.log(Level::Debug, message);
+        return;
     }
 
     /// Trace Log function
@@ -45,6 +47,7 @@ impl Logger {
     /// This the trace Log Level for the Logger
     pub fn trace(&self, message: &str) -> () {
         self.log(Level::Trace, message);
+        return;
     }
 
     /// Warn Log function
@@ -52,6 +55,7 @@ impl Logger {
     /// This the warn Log Level for the Logger
     pub fn warn(&self, message: &str) -> () {
         self.log(Level::Warn, message);
+        return;
     }
 
     fn log(&self, level: Level, message: &str) -> () {
