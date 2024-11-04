@@ -11,8 +11,8 @@ impl Port {
     }
 
     pub fn is_open(&self) -> Result<bool, io::Error> {
-        let addr = SocketAddr::from(([127, 0, 0, 1], self.port));
-        let listerner = TcpListener::bind(addr)?;
+        let addr: SocketAddr = SocketAddr::from(([127, 0, 0, 1], self.port));
+        let listerner: TcpListener = TcpListener::bind(addr)?;
         drop(listerner);
         Ok(true)
     }
