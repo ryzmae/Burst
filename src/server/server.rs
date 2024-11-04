@@ -4,7 +4,7 @@ use std::{
 };
 use chrono;
 use crate::logger::{Level, Logger};
-use crate::server::render_name::render_name;
+use crate::render::render_name;
 use crate::constants;
 
 pub fn run() {

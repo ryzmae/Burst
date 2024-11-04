@@ -92,6 +92,12 @@ impl Store {
         let mut contents = String::new();
         file.read_to_string(&mut contents).unwrap();
         let mut file = File::create(DEFAULT_DATA_FILE).unwrap();
-        file.write_all(contents.replace(data.as_str(), "").as_bytes()).unwrap();
+        file.write_all(contents.replace(data.as_str(), "").as_bytes())
+            .unwrap();
+    }
+
+    pub fn test(&self) -> String {
+        return "Hello, World!".to_string();
     }
 }
+
