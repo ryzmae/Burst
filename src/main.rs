@@ -9,6 +9,7 @@ pub mod constants;
 pub mod logger;
 pub mod memory;
 pub mod render;
+pub mod port;
 
 // Currently the main.rs file is the Test file for each module.
 fn main () {
