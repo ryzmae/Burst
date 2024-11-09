@@ -3,14 +3,12 @@ use anyhow::Result;
 pub mod constants;
 pub mod error;
 pub mod homedir;
-pub mod kvstore;
 pub mod logger;
 pub mod memory;
 pub mod port;
 pub mod prelude;
 pub mod render;
 pub mod server;
-pub mod store;
 pub mod time;
 pub mod base64;
 
