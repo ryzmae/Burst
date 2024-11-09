@@ -44,9 +44,8 @@ mod tests {
         let port = Port::new(5334);
 
         // if the port is already in use return true
-
-        if let Ok(_) = port.is_open() {
-            assert_eq!(port.is_open().unwrap(), true);
+        if port.is_open().is_err() {
+            assert!(true);
         }
         assert_eq!(port.is_open().unwrap(), true);
     }
@@ -54,6 +53,10 @@ mod tests {
     #[test]
     fn test_port_is_closed() {
         let port = Port::new(5334);
+        if port.is_closed().is_err() {
+            assert!(false);
+        }
+        
         assert_eq!(port.is_closed().unwrap(), false);
     }
 
