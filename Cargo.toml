@@ -1,9 +1,11 @@
 [package]
 name = "Burst"
-version = "0.1.0"
+version = "0.1.27"
 edition = "2021"
 
 [dependencies]
+anyhow = "1.0.89"
+base64 = "0.22.1"
 chrono = "0.4.38"
 color-eyre = "0.6.3"
 crossterm = "0.28.1"
@@ -11,10 +13,22 @@ figlet-rs = "0.1.5"
 home = "0.5.9"
 log = "0.4.22"
 rand = "0.8.5"
-ratatui = "0.28.1"
-thiserror = "1.0.64"
-tokio = { version = "1.40.0", features = ["full"] }
+thiserror = "2.0.1"
+toml = "0.8.19"
 uuid = "1.10.0"
 
 [dev-dependencies]
 anyhow = "1.0.89"
+
+# Release profile
+[profile.release]
+opt-level = "z"
+strip = true
+lto = true
+codegen-units = 1
+panic = "abort"
+
+# Devolopment profile
+[profile.dev]
+opt-level = 0
+panic = "abort"

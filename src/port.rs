@@ -42,7 +42,12 @@ mod tests {
     #[test]
     fn test_port_is_open() {
         let port = Port::new(5334);
-        // If the port is open, the test will pass else it will fail.
+
+        // if the port is already in use return true
+
+        if let Ok(_) = port.is_open() {
+            assert_eq!(port.is_open().unwrap(), true);
+        }
         assert_eq!(port.is_open().unwrap(), true);
     }
 
