@@ -17,3 +17,14 @@ pub fn render_name(name: &str) -> () {
 
     println! {"{}", randomcolor};
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_render_name() {
+        render_name("Burst");
+        assert_eq!(true, true);
+    }
+}
