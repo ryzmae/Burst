@@ -56,7 +56,7 @@ mod tests {
         if port.is_closed().is_err() {
             assert!(false);
         }
-        
+
         assert_eq!(port.is_closed().unwrap(), false);
     }
 

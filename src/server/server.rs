@@ -83,3 +83,83 @@ fn start_screen(port: u16) {
     _log.info(&format!("This instance of Burst is now ready to accept connections on port {}",port));
     _log.info(&format!("- Press ^C to stop the server",));
 }
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::thread;
+
+    #[test]
+    fn test_handle_connection_set_command() {
+        let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+        let addr = listener.local_addr().unwrap();
+
+        thread::spawn(move || {
+            for stream in listener.incoming() {
+                match stream {
+                    Ok(stream) => handle_connection(stream),
+                    Err(_) => break,
+                }
+            }
+        });
+
+        let mut stream = TcpStream::connect(addr).unwrap();
+        stream.write(b"SET key value").unwrap();
+        stream.flush().unwrap();
+
+        let mut buffer = [0; 1024];
+        stream.read(&mut buffer).unwrap();
+        let response = String::from_utf8_lossy(&buffer[..]);
+
+        assert!(response.contains("SET key: key value: value"));
+    }
+
+    #[test]
+    fn test_handle_connection_shutdown_command() {
+        let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+        let addr = listener.local_addr().unwrap();
+
+        thread::spawn(move || {
+            for stream in listener.incoming() {
+                match stream {
+                    Ok(stream) => handle_connection(stream),
+                    Err(_) => break,
+                }
+            }
+        });
+
+        let mut stream = TcpStream::connect(addr).unwrap();
+        stream.write(b"shutdown").unwrap();
+        stream.flush().unwrap();
+
+        let mut buffer = [0; 1024];
+        stream.read(&mut buffer).unwrap();
+        let response = String::from_utf8_lossy(&buffer[..]);
+
+        assert!(response.contains("Server is shutting down..."));
+    }
+
+    #[test]
+    fn test_handle_connection_unknown_command() {
+        let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+        let addr = listener.local_addr().unwrap();
+
+        thread::spawn(move || {
+            for stream in listener.incoming() {
+                match stream {
+                    Ok(stream) => handle_connection(stream),
+                    Err(_) => break,
+                }
+            }
+        });
+
+        let mut stream = TcpStream::connect(addr).unwrap();
+        stream.write(b"UNKNOWN").unwrap();
+        stream.flush().unwrap();
+
+        let mut buffer = [0; 1024];
+        stream.read(&mut buffer).unwrap();
+        let response = String::from_utf8_lossy(&buffer[..]);
+
+        assert!(response.contains("Command not found..."));
+    }
+}
