@@ -1,3 +1,6 @@
+# NOTE
+**This Branch is very old the newest branch is the V2 branch this will be merged into master branch in the near future!**
+
 # Burst
 
 Lighting fast in-memory database with on disk storage.
