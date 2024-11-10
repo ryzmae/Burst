@@ -1,16 +1,18 @@
-pub mod kvstore;
-pub mod store;
-pub mod memory;
-pub mod error;
-pub mod prelude;
-pub mod server;
-pub mod log;
-pub mod homedir;
-pub mod time;
+use anyhow::Result;
+
 pub mod constants;
+pub mod error;
+pub mod homedir;
+pub mod logger;
+pub mod memory;
+pub mod port;
+pub mod prelude;
+pub mod render;
+pub mod server;
+pub mod time;
 
-use crate::server::server::run;
-
-fn main () {
-    run();
+// Currently the main.rs file is the Test file for each module.
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    server::run();
+    Ok(())
 }

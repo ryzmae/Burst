@@ -1,23 +1,12 @@
 build:
-	@if [ -d "target" ]; then rm -rf target; fi
-	cargo build
-	clear
-	./target/debug/Burst
+	cargo +nightly build -Z build-std=std,panic_abort --target x86_64-apple-darwin --release
+	./target/x86_64-apple-darwin/release/burst
 
+dev:
+	
 run:
 	clear
 	cargo run
-
-build-release:
-	clear
-	@if [ -d "target" ]; then rm -rf target; fi
-	cargo build --release
-	clear
-	./target/release/Burst
-
-run-release:
-	clear
-	cargo run --release
 
 watch:
 	clear
