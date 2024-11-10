@@ -1,5 +1,7 @@
 use rand::seq::SliceRandom;
 
+use crate::port;
+
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 pub const ADDRESS: &str = "127.0.0.1";
 pub const MAX_MESSAGE_SIZE: usize = 1024;
@@ -15,7 +17,14 @@ pub fn spawn_port() -> u16 {
 
     drop(rng); // Drop the rng from memory
 
-    return *port; 
+    let _ports = port::Port::new(*port);
+
+    if let Ok(true) = _ports.is_closed() {
+        // If the port is closed, return the another port
+        return spawn_port();
+    } else {
+        return *port;
+    }
 }
 
 
