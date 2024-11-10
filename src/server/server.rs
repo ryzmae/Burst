@@ -8,10 +8,11 @@ use crate::render::render_name;
 use crate::constants;
 
 pub fn run() {
+    let _port = constants::spawn_port();
     let _log = Logger::new(Level::Info);
-    let addr = format!("{}:{}", constants::ADDRESS, constants::PORT);
+    let addr = format!("{}:{}", constants::ADDRESS, _port);
     let listner = TcpListener::bind(addr).expect("Failed to bind to address!");
-    start_screen(constants::PORT);
+    start_screen(_port);
 
     for stream in listner.incoming() {
         match stream {
@@ -80,7 +81,7 @@ fn start_screen(port: u16) {
     render_name("Burst");
 
     _log.info(&format!("v{} - PID {}", constants::VERSION, std::process::id()));
-    _log.info(&format!("This instance of Burst is now ready to accept connections on port {}",port));
+    _log.info(&format!("This instance of Burst is now ready to accept connections on port {}", port));
     _log.info(&format!("- Press ^C to stop the server",));
 }
 #[cfg(test)]
