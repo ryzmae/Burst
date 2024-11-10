@@ -70,23 +70,20 @@ impl Memory {
         self.expiry_queue.retain(|k| k != key);
     }
 
-    /// List all the key-value pairs in the data HashMap
-    /// # Example
-    /// ```no_run
-    /// let mut memory = Memory::new();
-    /// memory.set("key1".to_string(), "value1".to_string(), Duration::from_secs(1));
-    /// memory.set("key2".to_string(), "value2".to_string(), Duration::from_secs(1));
-    /// memory.set("key3".to_string(), "value3".to_string(), Duration::from_secs(1));
-    /// let expected_keys = vec!["key1".to_string(), "key2".to_string(), "key3".to_string()];
-    /// let listed_keys = memory.list().into_iter().map(|(k, _)| k).collect::<Vec<String>>();
-    /// assert!(expected_keys.iter().all(|key| listed_keys.contains(key)));
-    /// ```
+    /// This function is currently in testing and may be removed in the future!
     pub fn list(&self) -> Vec<(String, String)> {
-        self.data
-            .iter()
-            .filter(|(_, kv_pair)| kv_pair.expiry > Instant::now())
-            .map(|(key, kv_pair)| (key.clone(), kv_pair.value.clone())) // Clone the key and value
-            .collect()
+        let mut results = Vec::new();
+        let mut iter = self.expiry_queue.iter();
+        while let Some(key) = iter.next() {
+            if let Some(kv_pair) = self.data.get(key) {
+                if kv_pair.expiry > Instant::now() {
+                    results.push((key.clone(), kv_pair.value.clone()));
+                } else {
+                    break; // All subsequent keys in the queue will be expired
+                }
+            }
+        }
+        results
     }
 
     /// Clean expired key-value pairs from the data HashMap
