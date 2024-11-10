@@ -68,7 +68,7 @@ impl Memory {
         }
         self.data.remove(key);
         self.expiry_queue.retain(|k| k != key);
-    }   
+    }
 
     /// List all the key-value pairs in the data HashMap
     /// # Example
