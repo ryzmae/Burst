@@ -1,15 +1,3 @@
-# NOTE
-This branch is unreleased version and not stable or executable
-We are working to release this Branch in the near Feature 
-
-# Roadmap
-X = Not Done, V = Done 
-Homebrew support [x]
-Custom Libaries for each Language []
-    - Python [x]
-    - Javascript/Typescript [x]
-    - Rust [x]
-    - Golang [x]
 # Burst
 
 Lighting fast in-memory database with on disk storage.
@@ -21,6 +9,10 @@ Lighting fast in-memory database with on disk storage.
 - Fast
 
 ## Installation
+
+**Note**: You need to have [Rust](https://www.rust-lang.org/tools/install) installed on you're Machine.
+
+This approach to install Burst is a Dev version in the near feature we will add support for Package Manager's like HomeBrew etc.
 
 1. Clone the repository
 
@@ -35,12 +27,13 @@ cargo install --path .
 
 ```
 
-**Note:** You need to have [Rust](https://www.rust-lang.org/tools/install) installed.
 
 3. Run the application
 
+**Note**: This will compile the code and start up Burst 
+
 ```bash
-make build-release
+make build
 ```
 
 ## Usage
@@ -52,3 +45,17 @@ telnet 127.0.0.1 YOUR_PORT
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Background Task
+
+This current version of Burst is currently early stage Development version and we have not implemented a working Background Task that will keep server running in the Background
+
+Until we add a working Background Task you use **PM2** to run the Binary.
+
+```sh
+pm2 start path/to/binaryofBurst/    
+```
+
+You find the Binary in the Target folder.
+
+Now youre setup and you can start working with Burst.
