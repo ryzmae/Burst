@@ -1,6 +1,8 @@
 use std::{
     io::prelude::*,
     net::{TcpListener, TcpStream},
+    thread,
+    time::Duration,
 };
 use chrono;
 use crate::logger::{Level, Logger};
@@ -13,6 +15,17 @@ pub fn run() {
     let addr = format!("{}:{}", constants::ADDRESS, _port);
     let listner = TcpListener::bind(addr).expect("Failed to bind to address!");
     start_screen(_port);
+
+
+    let threadlog = Logger::new(Level::Info);
+
+    thread::spawn(move || {
+        loop {
+            // Testing for some time other background thread will delete the expired keys this is just for showing the logs
+            threadlog.info(&format!("Current time: {}", chrono::Utc::now().format("%d-%m-%y %H:%M:%S")));
+            thread::sleep(Duration::from_secs(1));
+        }
+    });
 
     for stream in listner.incoming() {
         match stream {
