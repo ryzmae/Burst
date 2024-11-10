@@ -1,5 +1,5 @@
-use std::time::{SystemTime, UNIX_EPOCH, Duration};
 use std::thread::sleep as thread_sleep;
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 pub fn ustime() -> u128 {
     let now = SystemTime::now();
@@ -60,5 +60,4 @@ mod tests {
 
         assert!(end - start >= 1000);
     }
-
 }

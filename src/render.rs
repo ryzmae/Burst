@@ -12,7 +12,7 @@ pub fn render_name(name: &str) {
         3 => binding.unwrap().yellow().bold().to_string(),
         4 => binding.unwrap().blue().bold().to_string(),
         5 => binding.unwrap().magenta().bold().to_string(),
-        _ => binding.unwrap().bright_yellow().bold().to_string() // Default if no match
+        _ => binding.unwrap().bright_yellow().bold().to_string(), // Default if no match
     };
 
     println! {"{}", randomcolor};

@@ -1,13 +1,13 @@
+use crate::constants;
+use crate::logger::{Level, Logger};
+use crate::render::render_name;
+use chrono;
 use std::{
     io::prelude::*,
     net::{TcpListener, TcpStream},
     thread,
     time::Duration,
 };
-use chrono;
-use crate::logger::{Level, Logger};
-use crate::render::render_name;
-use crate::constants;
 
 pub fn run() {
     let _port = constants::spawn_port();
@@ -16,13 +16,15 @@ pub fn run() {
     let listner = TcpListener::bind(addr).expect("Failed to bind to address!");
     start_screen(_port);
 
-
     let threadlog = Logger::new(Level::Info);
 
     thread::spawn(move || {
         loop {
             // Testing for some time other background thread will delete the expired keys this is just for showing the logs
-            threadlog.info(&format!("Current time: {}", chrono::Utc::now().format("%d-%m-%y %H:%M:%S")));
+            threadlog.info(&format!(
+                "Current time: {}",
+                chrono::Utc::now().format("%d-%m-%y %H:%M:%S")
+            ));
             thread::sleep(Duration::from_secs(1));
         }
     });
@@ -38,7 +40,6 @@ pub fn run() {
         }
     }
 }
-
 
 fn handle_connection(mut stream: TcpStream) {
     let mut buffer = [0; 1024];
@@ -111,8 +112,15 @@ fn start_screen(port: u16) {
     let _log = Logger::new(Level::Info);
     render_name("Burst");
 
-    _log.info(&format!("v{} - PID {}", constants::VERSION, std::process::id()));
-    _log.info(&format!("This instance of Burst is now ready to accept connections on port {}", port));
+    _log.info(&format!(
+        "v{} - PID {}",
+        constants::VERSION,
+        std::process::id()
+    ));
+    _log.info(&format!(
+        "This instance of Burst is now ready to accept connections on port {}",
+        port
+    ));
     _log.info("- Press ^C to stop the server");
 }
 #[cfg(test)]
