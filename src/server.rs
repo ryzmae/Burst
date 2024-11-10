@@ -42,9 +42,14 @@ pub fn run() {
 
 fn handle_connection(mut stream: TcpStream) {
     let mut buffer = [0; 1024];
-    let log = Logger::new(Level::Info);
+    let read = stream.read(&mut buffer).unwrap();
 
-    stream.read(&mut buffer).expect("Failed to read from client!");
+    // If the buffer is empty, return
+    if read == 0 {
+        return;
+    }
+
+    let log = Logger::new(Level::Info);
     let request = String::from_utf8_lossy(&buffer[..]);
     let loginfo = format!("Request: {}", request);
 
@@ -53,14 +58,17 @@ fn handle_connection(mut stream: TcpStream) {
     let date = chrono::Utc::now().format("%d-%m-%y %H:%M:%S").to_string();
 
     if request.contains("shutdown") {
-        let response = format!("Server is shutting down...");
+        let response = "Server is shutting down...".to_string();
 
-        stream.write(response.as_bytes()).unwrap();
+        let bytes_amount = stream.write(response.as_bytes()).unwrap();
+
+        if bytes_amount == 0 {
+            return;
+        }
+
         stream.flush().unwrap();
 
         log.info(&response);
-        
-        log.info("Shutting down the server...");
 
         std::process::exit(0);
     } else if request.contains("SET") {
@@ -71,7 +79,12 @@ fn handle_connection(mut stream: TcpStream) {
 
         let response = format!("[{}] - SET key: {} value: {}", date, key, value);
 
-        stream.write(response.as_bytes()).unwrap();
+        let bytes_amount = stream.write(response.as_bytes()).unwrap();
+
+        if bytes_amount == 0 {
+            return;
+        }
+
         stream.flush().unwrap();
 
         log.info(&response);
@@ -80,7 +93,12 @@ fn handle_connection(mut stream: TcpStream) {
     } else {
         let response = format!("[{}] - Command not found...", date);
 
-        stream.write(response.as_bytes()).unwrap();
+        let bytes_amount = stream.write(response.as_bytes()).unwrap();
+
+        if bytes_amount == 0 {
+            return;
+        }
+
         stream.flush().unwrap();
 
         log.info(&response);
@@ -95,7 +113,7 @@ fn start_screen(port: u16) {
 
     _log.info(&format!("v{} - PID {}", constants::VERSION, std::process::id()));
     _log.info(&format!("This instance of Burst is now ready to accept connections on port {}", port));
-    _log.info(&format!("- Press ^C to stop the server",));
+    _log.info("- Press ^C to stop the server");
 }
 #[cfg(test)]
 mod tests {

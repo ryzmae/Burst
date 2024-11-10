@@ -20,10 +20,9 @@ pub fn spawn_port() -> u16 {
     let _ports = port::Port::new(*port);
 
     if let Ok(true) = _ports.is_closed() {
-        // If the port is closed, return the another port
-        return spawn_port();
+        spawn_port()
     } else {
-        return *port;
+        *port
     }
 }
 

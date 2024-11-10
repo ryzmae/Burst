@@ -13,6 +13,6 @@ pub mod time;
 
 // Currently the main.rs file is the Test file for each module.
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    server::server::run();
+    server::run();
     Ok(())
 }

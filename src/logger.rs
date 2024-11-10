@@ -23,42 +23,38 @@ impl Logger {
     }
 
     fn default_log_file(&self) -> String {
-        return homedir() + "/.burst.log";
+        homedir() + "/.burst.log"
     }
 
     /// Info Log function
     /// Prints: [INFO] - message to the log file and stdout
     /// This the default Log Level for the Logger
-    pub fn info(&self, message: &str) -> () {
+    pub fn info(&self, message: &str) {
         self.log(Level::Info, message);
-        return;
     }
 
     /// Debug Log function
     /// Prints: [DEBUG] - message to the log file and stdout
     /// This the debug Log Level for the Logger
-    pub fn debug(&self, message: &str) -> () {
+    pub fn debug(&self, message: &str) {
         self.log(Level::Debug, message);
-        return;
     }
 
     /// Trace Log function
     /// Prints: [TRACE] - message to the log file and stdout
     /// This the trace Log Level for the Logger
-    pub fn trace(&self, message: &str) -> () {
+    pub fn trace(&self, message: &str) {
         self.log(Level::Trace, message);
-        return;
     }
 
     /// Warn Log function
     /// Prints: [WARN] - message to the log file and stdout
     /// This the warn Log Level for the Logger
-    pub fn warn(&self, message: &str) -> () {
+    pub fn warn(&self, message: &str) {
         self.log(Level::Warn, message);
-        return;
     }
 
-    fn log(&self, level: Level, message: &str) -> () {
+    fn log(&self, level: Level, message: &str) {
         let _colored_level = match level {
             Level::Debug => "DEBUG".green().bold().to_string(),
             Level::Info => "INFO".blue().bold().to_string(),
@@ -73,11 +69,10 @@ impl Logger {
             Level::Warn => "WARN",
         };
 
-        let _current_time = format!("[{}]", Utc::now().format("%Y-%m-%d %H:%M:%S,%3f").to_string());
+        let _current_time = format!("[{}]", Utc::now().format("%Y-%m-%d %H:%M:%S,%3f"));
         let log_message = format!("{} - {} - {}", _current_time, _colored_level, message);
         let log_file_message = format!("{} - {} - {}\n", _current_time, _default_level, message);
         let mut file = OpenOptions::new()
-            .write(true)
             .append(true)
             .open(self.default_log_file())
             .unwrap();

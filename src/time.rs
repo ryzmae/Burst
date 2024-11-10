@@ -4,13 +4,12 @@ use std::thread::sleep as thread_sleep;
 pub fn ustime() -> u128 {
     let now = SystemTime::now();
     let since_the_epoch = now.duration_since(UNIX_EPOCH).expect("Time went backwards");
-    let micros = since_the_epoch.as_micros();
 
-    return micros;
+    since_the_epoch.as_micros()
 }
 
 pub fn mstime() -> u128 {
-    return ustime() / 1000;
+    ustime() / 1000
 }
 
 pub fn sleep(ms: u64) {

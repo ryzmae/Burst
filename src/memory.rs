@@ -31,7 +31,7 @@ impl Memory {
     /// let mut memory = Memory::new();
     /// memory.set("key".to_string(), "value".to_string(), Duration::from_secs(1));
     /// ```
-    pub fn set(&mut self, key: String, value: String, expiry: Duration) -> () {
+    pub fn set(&mut self, key: String, value: String, expiry: Duration) {
         let expires_at = Instant::now() + expiry;
         let kv_pair = KeyValuePair {
             key: key.clone(),
@@ -61,7 +61,7 @@ impl Memory {
     /// memory.delete("key");
     /// assert_eq!(memory.get("key"), None);
     /// ```
-    pub fn delete(&mut self, key: &str) -> () {
+    pub fn delete(&mut self, key: &str) {
         // Check if the key exists in the data
         if !self.data.contains_key(key) {
             return;
@@ -73,8 +73,8 @@ impl Memory {
     /// This function is currently in testing and may be removed in the future!
     pub fn list(&self) -> Vec<(String, String)> {
         let mut results = Vec::new();
-        let mut iter = self.expiry_queue.iter();
-        while let Some(key) = iter.next() {
+        let iter = self.expiry_queue.iter();
+        for key in iter {
             if let Some(kv_pair) = self.data.get(key) {
                 if kv_pair.expiry > Instant::now() {
                     results.push((key.clone(), kv_pair.value.clone()));
@@ -97,7 +97,7 @@ impl Memory {
     /// memory.clean_expired();
     /// assert_eq!(memory.list(), vec![]);
     /// ```
-    pub fn clean_expired(&mut self) -> () {
+    pub fn clean_expired(&mut self) {
         while let Some(key) = self.expiry_queue.front() {
             if let Some(kv_pair) = self.data.get(key) {
                 if kv_pair.expiry <= Instant::now() {
@@ -108,6 +108,12 @@ impl Memory {
                 }
             }
         }
+    }
+}
+
+impl Default for Memory {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
