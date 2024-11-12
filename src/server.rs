@@ -39,6 +39,8 @@ pub fn run() {
             }
         }
     }
+
+    drop(listner); // Close the listener socket to free up the port
 }
 
 fn handle_connection(mut stream: TcpStream) {
@@ -89,8 +91,6 @@ fn handle_connection(mut stream: TcpStream) {
         stream.flush().unwrap();
 
         log.info(&response);
-
-        return;
     } else {
         let response = format!("[{}] - Command not found...", date);
 
@@ -103,9 +103,9 @@ fn handle_connection(mut stream: TcpStream) {
         stream.flush().unwrap();
 
         log.info(&response);
-
-        return;
     }
+
+    drop(stream); // Close the stream to free up the port
 }
 
 fn start_screen(port: u16) {
@@ -122,6 +122,8 @@ fn start_screen(port: u16) {
         port
     ));
     _log.info("- Press ^C to stop the server");
+
+    drop(_log);
 }
 #[cfg(test)]
 mod tests {
