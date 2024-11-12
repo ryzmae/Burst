@@ -1,3 +1,5 @@
+use std::io::{stdout, Write};
+
 use color_eyre::owo_colors::OwoColorize;
 use figlet_rs::FIGfont;
 
@@ -6,16 +8,16 @@ pub fn render_name(name: &str) {
 
     let binding = font.convert(name);
 
-    let randomcolor = match rand::random::<u8>() % 6 {
-        1 => binding.unwrap().red().bold().to_string(),
-        2 => binding.unwrap().green().bold().to_string(),
-        3 => binding.unwrap().yellow().bold().to_string(),
-        4 => binding.unwrap().blue().bold().to_string(),
-        5 => binding.unwrap().magenta().bold().to_string(),
+    let randomcolor = match rand::random::<u8>() % 5 {
+        1 => binding.unwrap().bright_red().bold().to_string(),
+        2 => binding.unwrap().bright_green().bold().to_string(),
+        3 => binding.unwrap().bright_blue().bold().to_string(),
+        4 => binding.unwrap().bright_magenta().bold().to_string(),
         _ => binding.unwrap().bright_yellow().bold().to_string(), // Default if no match
     };
 
-    println! {"{}", randomcolor};
+    // Uses less memory than println!() due to buffering
+    stdout().write_all(randomcolor.as_bytes()).unwrap();
 }
 
 #[cfg(test)]
