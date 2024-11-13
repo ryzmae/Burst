@@ -10,13 +10,13 @@ use std::{
 };
 
 pub fn run() {
-    let _port = constants::spawn_port();
-    let _log = Logger::new(Level::Info);
-    let addr = format!("{}:{}", constants::ADDRESS, _port);
-    let listner = TcpListener::bind(addr).expect("Failed to bind to address!");
+    let _port = 4321; // constants::spawn_port();
+    let _log: Logger = Logger::new(Level::Info);
+    let addr: String = format!("{}:{}", constants::ADDRESS, _port);
+    let listner: TcpListener = TcpListener::bind(addr).expect("Failed to bind to address!");
     start_screen(_port);
 
-    let threadlog = Logger::new(Level::Info);
+    let threadlog: Logger = Logger::new(Level::Info);
 
     thread::spawn(move || {
         loop {
@@ -44,65 +44,70 @@ pub fn run() {
 }
 
 fn handle_connection(mut stream: TcpStream) {
-    let mut buffer = [0; 1024];
-    let read = stream.read(&mut buffer).unwrap();
+    let mut buffer: [u8; 1024] = [0; 1024];
+    let read: usize = stream.read(&mut buffer).unwrap();
 
     // If the buffer is empty, return
     if read == 0 {
         return;
     }
 
-    let log = Logger::new(Level::Info);
-    let request = String::from_utf8_lossy(&buffer[..]);
-    let loginfo = format!("Request: {}", request);
+    let request: std::borrow::Cow<'_, str> = String::from_utf8_lossy(&buffer[..]);
 
-    log.info(&loginfo, None);
-
-    let date = chrono::Utc::now().format("%d-%m-%y %H:%M:%S").to_string();
+    let date: String = chrono::Utc::now().format("%d-%m-%y %H:%M:%S").to_string();
 
     if request.contains("shutdown") {
-        let response = "Server is shutting down...".to_string();
+        let response: String = "Server is shutting down...".to_string();
 
-        let bytes_amount = stream.write(response.as_bytes()).unwrap();
+        let bytes_amount: usize = stream.write(response.as_bytes()).unwrap();
 
         if bytes_amount == 0 {
             return;
         }
 
         stream.flush().unwrap();
-
-        log.info(&response, None);
 
         std::process::exit(0);
     } else if request.contains("SET") {
-        let args = request.split_whitespace().collect::<Vec<&str>>();
+        let args: Vec<&str> = request.split_whitespace().collect::<Vec<&str>>();
 
-        let key = args[1];
-        let value = args[2];
+        let key: &str = args[1];
+        let value: &str = args[2];
 
-        let response = format!("[{}] - SET key: {} value: {}", date, key, value);
+        // Check if the message_size is greater than the MAX_MESSAGE_SIZE
+        if value.len() > constants::MAX_MESSAGE_SIZE {
+            let response: String = format!("[{}] - Data size is too large...", date);
 
-        let bytes_amount = stream.write(response.as_bytes()).unwrap();
+            let bytes_amount: usize = stream.write(response.as_bytes()).unwrap();
+
+            if bytes_amount == 0 {
+                return;
+            }
+
+            stream.flush().unwrap();
+
+            return;
+        }
+
+        let response: String = format!("[{}] - SET key: {} value: {}", date, key, value);
+
+        let bytes_amount: usize = stream.write(response.as_bytes()).unwrap();
 
         if bytes_amount == 0 {
             return;
         }
 
         stream.flush().unwrap();
-
-        log.info(&response, None);
     } else {
-        let response = format!("[{}] - Command not found...", date);
+        let response: String = format!("[{}] - Command not found...", date);
 
-        let bytes_amount = stream.write(response.as_bytes()).unwrap();
+        let bytes_amount: usize = stream.write(response.as_bytes()).unwrap();
 
         if bytes_amount == 0 {
             return;
         }
 
         stream.flush().unwrap();
-
-        log.info(&response, None);
     }
 
     drop(stream); // Close the stream to free up the port
