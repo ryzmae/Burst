@@ -1,7 +1,10 @@
 use crate::constants;
 use crate::logger::{Level, Logger};
 use crate::render::render_name;
+use crate::memory;
 use chrono;
+use std::ptr::slice_from_raw_parts_mut;
+use std::str::FromStr;
 use std::{
     io::prelude::*,
     net::{TcpListener, TcpStream},
@@ -73,6 +76,35 @@ fn handle_connection(mut stream: TcpStream) {
 
         let key: &str = args[1];
         let value: &str = args[2];
+        let ttl = args[3];
+
+        if key.is_empty() || value.is_empty() || ttl.is_empty() {
+            let response: String = format!("[{}] - Key, value or ttl is empty...", date);
+
+            let bytes_amount: usize = stream.write(response.as_bytes()).unwrap();
+
+            if bytes_amount == 0 {
+                return;
+            }
+
+            stream.flush().unwrap();
+
+            return;
+        } else if !ttl.is_empty() && !ttl.parse::<u64>().is_ok() {
+            let response: String = format!("[{}] - TTL is not a number...", date);
+
+            let bytes_amount: usize = stream.write(response.as_bytes()).unwrap();
+
+            if bytes_amount == 0 {
+                return;
+            }
+
+            stream.flush().unwrap();
+
+            return;
+        }
+
+        let mut memory_struct = memory::Memory::new();
 
         // Check if the message_size is greater than the MAX_MESSAGE_SIZE
         if value.len() > constants::MAX_MESSAGE_SIZE {
@@ -89,6 +121,7 @@ fn handle_connection(mut stream: TcpStream) {
             return;
         }
 
+        memory_struct.set(String::from(key), String::from(value), Duration::from_secs(ttl.parse::<u64>().unwrap()));
         let response: String = format!("[{}] - SET key: {} value: {}", date, key, value);
 
         let bytes_amount: usize = stream.write(response.as_bytes()).unwrap();
