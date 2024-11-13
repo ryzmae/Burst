@@ -23,8 +23,8 @@ pub fn run() {
             // Testing for some time other background thread will delete the expired keys this is just for showing the logs
             threadlog.info(&format!(
                 "Current time: {}",
-                chrono::Utc::now().format("%d-%m-%y %H:%M:%S")
-            ));
+                chrono::Utc::now().format("%d-%m-%y %H:%M:%S"),
+            ), None);
             thread::sleep(Duration::from_secs(1));
         }
     });
@@ -35,7 +35,7 @@ pub fn run() {
                 std::thread::spawn(|| handle_connection(stream));
             }
             Err(e) => {
-                _log.trace(&format!("Failed to establish a connection: {}", e));
+                _log.trace(&format!("Failed to establish a connection: {}", e), None);
             }
         }
     }
@@ -56,7 +56,7 @@ fn handle_connection(mut stream: TcpStream) {
     let request = String::from_utf8_lossy(&buffer[..]);
     let loginfo = format!("Request: {}", request);
 
-    log.info(&loginfo);
+    log.info(&loginfo, None);
 
     let date = chrono::Utc::now().format("%d-%m-%y %H:%M:%S").to_string();
 
@@ -71,7 +71,7 @@ fn handle_connection(mut stream: TcpStream) {
 
         stream.flush().unwrap();
 
-        log.info(&response);
+        log.info(&response, None);
 
         std::process::exit(0);
     } else if request.contains("SET") {
@@ -90,7 +90,7 @@ fn handle_connection(mut stream: TcpStream) {
 
         stream.flush().unwrap();
 
-        log.info(&response);
+        log.info(&response, None);
     } else {
         let response = format!("[{}] - Command not found...", date);
 
@@ -102,7 +102,7 @@ fn handle_connection(mut stream: TcpStream) {
 
         stream.flush().unwrap();
 
-        log.info(&response);
+        log.info(&response, None);
     }
 
     drop(stream); // Close the stream to free up the port
@@ -116,12 +116,12 @@ fn start_screen(port: u16) {
         "v{} - PID {}",
         constants::VERSION,
         std::process::id()
-    ));
+    ), None);
     _log.info(&format!(
         "This instance of Burst is now ready to accept connections on port {}",
         port
-    ));
-    _log.info("- Press ^C to stop the server");
+    ), None);
+    _log.info("- Press ^C to stop the server", None);
 
     drop(_log);
 }
