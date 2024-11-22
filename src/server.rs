@@ -1,7 +1,10 @@
 use crate::constants;
 use crate::logger::{Level, Logger};
 use crate::render::render_name;
+use crate::memory;
 use chrono;
+use std::ptr::slice_from_raw_parts_mut;
+use std::str::FromStr;
 use std::{
     io::prelude::*,
     net::{TcpListener, TcpStream},
@@ -10,21 +13,21 @@ use std::{
 };
 
 pub fn run() {
-    let _port = constants::spawn_port();
-    let _log = Logger::new(Level::Info);
-    let addr = format!("{}:{}", constants::ADDRESS, _port);
-    let listner = TcpListener::bind(addr).expect("Failed to bind to address!");
+    let _port = 4321; // constants::spawn_port();
+    let _log: Logger = Logger::new(Level::Info);
+    let addr: String = format!("{}:{}", constants::ADDRESS, _port);
+    let listner: TcpListener = TcpListener::bind(addr).expect("Failed to bind to address!");
     start_screen(_port);
 
-    let threadlog = Logger::new(Level::Info);
+    let threadlog: Logger = Logger::new(Level::Info);
 
     thread::spawn(move || {
         loop {
             // Testing for some time other background thread will delete the expired keys this is just for showing the logs
             threadlog.info(&format!(
                 "Current time: {}",
-                chrono::Utc::now().format("%d-%m-%y %H:%M:%S")
-            ));
+                chrono::Utc::now().format("%d-%m-%y %H:%M:%S"),
+            ), None);
             thread::sleep(Duration::from_secs(1));
         }
     });
@@ -35,77 +38,112 @@ pub fn run() {
                 std::thread::spawn(|| handle_connection(stream));
             }
             Err(e) => {
-                _log.trace(&format!("Failed to establish a connection: {}", e));
+                _log.trace(&format!("Failed to establish a connection: {}", e), None);
             }
         }
     }
+
+    drop(listner); // Close the listener socket to free up the port
 }
 
 fn handle_connection(mut stream: TcpStream) {
-    let mut buffer = [0; 1024];
-    let read = stream.read(&mut buffer).unwrap();
+    let mut buffer: [u8; 1024] = [0; 1024];
+    let read: usize = stream.read(&mut buffer).unwrap();
 
     // If the buffer is empty, return
     if read == 0 {
         return;
     }
 
-    let log = Logger::new(Level::Info);
-    let request = String::from_utf8_lossy(&buffer[..]);
-    let loginfo = format!("Request: {}", request);
+    let request: std::borrow::Cow<'_, str> = String::from_utf8_lossy(&buffer[..]);
 
-    log.info(&loginfo);
-
-    let date = chrono::Utc::now().format("%d-%m-%y %H:%M:%S").to_string();
+    let date: String = chrono::Utc::now().format("%d-%m-%y %H:%M:%S").to_string();
 
     if request.contains("shutdown") {
-        let response = "Server is shutting down...".to_string();
+        let response: String = "Server is shutting down...".to_string();
 
-        let bytes_amount = stream.write(response.as_bytes()).unwrap();
+        let bytes_amount: usize = stream.write(response.as_bytes()).unwrap();
 
         if bytes_amount == 0 {
             return;
         }
 
         stream.flush().unwrap();
-
-        log.info(&response);
 
         std::process::exit(0);
     } else if request.contains("SET") {
-        let args = request.split_whitespace().collect::<Vec<&str>>();
+        let args: Vec<&str> = request.split_whitespace().collect::<Vec<&str>>();
 
-        let key = args[1];
-        let value = args[2];
+        let key: &str = args[1];
+        let value: &str = args[2];
+        let ttl = args[3];
 
-        let response = format!("[{}] - SET key: {} value: {}", date, key, value);
+        if key.is_empty() || value.is_empty() || ttl.is_empty() {
+            let response: String = format!("[{}] - Key, value or ttl is empty...", date);
 
-        let bytes_amount = stream.write(response.as_bytes()).unwrap();
+            let bytes_amount: usize = stream.write(response.as_bytes()).unwrap();
+
+            if bytes_amount == 0 {
+                return;
+            }
+
+            stream.flush().unwrap();
+
+            return;
+        } else if !ttl.is_empty() && !ttl.parse::<u64>().is_ok() {
+            let response: String = format!("[{}] - TTL is not a number...", date);
+
+            let bytes_amount: usize = stream.write(response.as_bytes()).unwrap();
+
+            if bytes_amount == 0 {
+                return;
+            }
+
+            stream.flush().unwrap();
+
+            return;
+        }
+
+        let mut memory_struct = memory::Memory::new();
+
+        // Check if the message_size is greater than the MAX_MESSAGE_SIZE
+        if value.len() > constants::MAX_MESSAGE_SIZE {
+            let response: String = format!("[{}] - Data size is too large...", date);
+
+            let bytes_amount: usize = stream.write(response.as_bytes()).unwrap();
+
+            if bytes_amount == 0 {
+                return;
+            }
+
+            stream.flush().unwrap();
+
+            return;
+        }
+
+        memory_struct.set(String::from(key), String::from(value), Duration::from_secs(ttl.parse::<u64>().unwrap()));
+        let response: String = format!("[{}] - SET key: {} value: {}", date, key, value);
+
+        let bytes_amount: usize = stream.write(response.as_bytes()).unwrap();
 
         if bytes_amount == 0 {
             return;
         }
 
         stream.flush().unwrap();
-
-        log.info(&response);
-
-        return;
     } else {
-        let response = format!("[{}] - Command not found...", date);
+        let response: String = format!("[{}] - Command not found...", date);
 
-        let bytes_amount = stream.write(response.as_bytes()).unwrap();
+        let bytes_amount: usize = stream.write(response.as_bytes()).unwrap();
 
         if bytes_amount == 0 {
             return;
         }
 
         stream.flush().unwrap();
-
-        log.info(&response);
-
-        return;
     }
+
+    drop(stream); // Close the stream to free up the port
 }
 
 fn start_screen(port: u16) {
@@ -116,12 +154,14 @@ fn start_screen(port: u16) {
         "v{} - PID {}",
         constants::VERSION,
         std::process::id()
-    ));
+    ), None);
     _log.info(&format!(
         "This instance of Burst is now ready to accept connections on port {}",
         port
-    ));
-    _log.info("- Press ^C to stop the server");
+    ), None);
+    _log.info("- Press ^C to stop the server", None);
+
+    drop(_log);
 }
 #[cfg(test)]
 mod tests {

@@ -29,28 +29,44 @@ impl Logger {
     /// Info Log function
     /// Prints: [INFO] - message to the log file and stdout
     /// This the default Log Level for the Logger
-    pub fn info(&self, message: &str) {
+    pub fn info(&self, message: &str, level: Option<Level>) {
+        if let Some(level) = level {
+            self.log(level, message);
+            return;
+        }
         self.log(Level::Info, message);
     }
 
     /// Debug Log function
     /// Prints: [DEBUG] - message to the log file and stdout
     /// This the debug Log Level for the Logger
-    pub fn debug(&self, message: &str) {
+    pub fn debug(&self, message: &str, level: Option<Level>) {
+        if let Some(level) = level {
+            self.log(level, message);
+            return;
+        }
         self.log(Level::Debug, message);
     }
 
     /// Trace Log function
     /// Prints: [TRACE] - message to the log file and stdout
     /// This the trace Log Level for the Logger
-    pub fn trace(&self, message: &str) {
+    pub fn trace(&self, message: &str, level: Option<Level>) {
+        if let Some(level) = level {
+            self.log(level, message);
+            return;
+        }
         self.log(Level::Trace, message);
     }
 
     /// Warn Log function
     /// Prints: [WARN] - message to the log file and stdout
     /// This the warn Log Level for the Logger
-    pub fn warn(&self, message: &str) {
+    pub fn warn(&self, message: &str, level: Option<Level>) {
+        if let Some(level) = level {
+            self.log(level, message);
+            return;
+        }
         self.log(Level::Warn, message);
     }
 
@@ -78,6 +94,8 @@ impl Logger {
             .unwrap();
 
         file.write_all(log_file_message.as_bytes()).unwrap();
+        drop(file); // Close the file 
+
         println!("{}", log_message);
     }
 }
@@ -89,10 +107,10 @@ mod tests {
     #[test]
     fn test_logger() {
         let logger = Logger::new(Level::Info);
-        logger.info("Info Log");
-        logger.debug("Debug Log");
-        logger.trace("Trace Log");
-        logger.warn("Warn Log");
+        logger.info("Info Log", None);
+        logger.debug("Debug Log", None);
+        logger.trace("Trace Log", None);
+        logger.warn("Warn Log", None);
     }
 
     #[test]
@@ -113,24 +131,24 @@ mod tests {
     #[test]
     fn test_info() {
         let logger = Logger::new(Level::Info);
-        logger.info("Info Log");
+        logger.info("Info Log", None);
     }
 
     #[test]
     fn test_debug() {
         let logger = Logger::new(Level::Info);
-        logger.debug("Debug Log");
+        logger.debug("Debug Log", None);
     }
 
     #[test]
     fn test_trace() {
         let logger = Logger::new(Level::Info);
-        logger.trace("Trace Log");
+        logger.trace("Trace Log", None);
     }
 
     #[test]
     fn test_warn() {
         let logger = Logger::new(Level::Info);
-        logger.warn("Warn Log");
+        logger.warn("Warn Log", None);
     }
 }
